@@ -13,13 +13,14 @@ from datetime import datetime
 # =========================
 # 1. Config System
 # =========================
-def get_config():
+def get_config(main_path):
     config = {
         "batch_size": 128,
         "learning_rate": 0.001,
         "epochs": 20,
         "num_workers": 2,
-        "experiment_root": "./experiments",
+        "experiment_root": os.path.join(main_path, "train_cifar10_classification/experiments"),
+        "dataset_path": os.path.join(main_path, "datasets/CIFAR10"),
         "model_name": "SimpleCNN"
     }
     return config
@@ -51,10 +52,10 @@ def get_dataloaders(config):
     ])
 
     trainset = torchvision.datasets.CIFAR10(
-        root="../datasets/CIFAR10", train=True, download=True, transform=transform
+        root=config["dataset_path"], train=True, download=True, transform=transform
     )
     testset = torchvision.datasets.CIFAR10(
-        root="../datasets/CIFAR10", train=False, download=True, transform=transform
+        root=config["dataset_path"], train=False, download=True, transform=transform
     )
 
     trainloader = torch.utils.data.DataLoader(
@@ -169,8 +170,8 @@ def save_checkpoint(model, path, name):
 # =========================
 # 8. Main Experiment Runner
 # =========================
-def run():
-    config = get_config()
+def run(main_path):
+    config = get_config(main_path)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
