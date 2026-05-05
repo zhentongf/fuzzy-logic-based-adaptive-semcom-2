@@ -18,7 +18,7 @@ def get_config(main_path):
         "batch_size": 128,
         "learning_rate": 0.001,
         "epochs": 20,
-        "num_workers": 2,
+        "num_workers": 0,
         "experiment_root": os.path.join(main_path, "train_cifar10_classification/experiments"),
         "dataset_path": os.path.join(main_path, "datasets/CIFAR10"),
         "model_name": "SimpleCNN"

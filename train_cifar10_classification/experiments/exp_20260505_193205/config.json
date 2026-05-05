@@ -1,0 +1,9 @@
+{
+    "batch_size": 128,
+    "learning_rate": 0.001,
+    "epochs": 20,
+    "num_workers": 0,
+    "experiment_root": "d:\\fzt\\github-mine\\fuzzy-logic-based-adaptive-semcom-2\\train_cifar10_classification/experiments",
+    "dataset_path": "d:\\fzt\\github-mine\\fuzzy-logic-based-adaptive-semcom-2\\datasets/CIFAR10",
+    "model_name": "SimpleCNN"
+}
