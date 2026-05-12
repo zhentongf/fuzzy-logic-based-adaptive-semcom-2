@@ -1,28 +1,42 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import torchvision
-import torchvision.transforms as transforms
 
 import time
 import os
 import json
 import csv
+
 from datetime import datetime
+
+from dataloaders.dataloader_cifar10 import get_dataloaders
+from train_cifar10_classification.models.googlenet import GoogLeNet
+
 
 # =========================
 # 1. Config System
 # =========================
 def get_config(main_path):
+
     config = {
-        "batch_size": 128,
+        "batch_size": 64,
         "learning_rate": 0.001,
-        "epochs": 20,
+        "epochs": 30,
         "num_workers": 0,
-        "experiment_root": os.path.join(main_path, "train_cifar10_classification/experiments"),
-        "dataset_path": os.path.join(main_path, "datasets/CIFAR10"),
-        "model_name": "SimpleCNN"
+
+        "experiment_root": os.path.join(
+            main_path,
+            "train_cifar10_classification/experiments"
+        ),
+
+        "dataset_path": os.path.join(
+            main_path,
+            "datasets/CIFAR10"
+        ),
+
+        "model_name": "GoogLeNet"
     }
+
     return config
 
 
@@ -30,197 +44,235 @@ def get_config(main_path):
 # 2. Experiment Setup
 # =========================
 def create_experiment_folder(config):
+
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    exp_path = os.path.join(config["experiment_root"], f"exp_{timestamp}")
+
+    exp_path = os.path.join(
+        config["experiment_root"],
+        f"exp_{timestamp}"
+    )
+
     os.makedirs(exp_path, exist_ok=True)
+
     return exp_path
 
 
 def save_config(config, path):
+
     with open(os.path.join(path, "config.json"), "w") as f:
         json.dump(config, f, indent=4)
 
 
 # =========================
-# 3. Dataset
-# =========================
-def get_dataloaders(config):
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5),
-                             (0.5, 0.5, 0.5))
-    ])
-
-    trainset = torchvision.datasets.CIFAR10(
-        root=config["dataset_path"], train=True, download=True, transform=transform
-    )
-    testset = torchvision.datasets.CIFAR10(
-        root=config["dataset_path"], train=False, download=True, transform=transform
-    )
-
-    trainloader = torch.utils.data.DataLoader(
-        trainset,
-        batch_size=config["batch_size"],
-        shuffle=True,
-        num_workers=config["num_workers"]
-    )
-
-    testloader = torch.utils.data.DataLoader(
-        testset,
-        batch_size=config["batch_size"],
-        shuffle=False,
-        num_workers=config["num_workers"]
-    )
-
-    return trainloader, testloader
-
-
-# =========================
-# 4. Model
-# =========================
-class SimpleCNN(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.features = nn.Sequential(
-            nn.Conv2d(3, 32, 3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2),
-
-            nn.Conv2d(32, 64, 3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2),
-        )
-
-        self.classifier = nn.Sequential(
-            nn.Flatten(),
-            nn.Linear(64 * 8 * 8, 256),
-            nn.ReLU(),
-            nn.Linear(256, 10)
-        )
-
-    def forward(self, x):
-        return self.classifier(self.features(x))
-
-
-# =========================
-# 5. Train & Eval
+# 3. Train One Epoch
 # =========================
 def train_one_epoch(model, loader, criterion, optimizer, device):
+
     model.train()
-    correct, total = 0, 0
+
+    running_loss = 0
+    correct = 0
+    total = 0
 
     for inputs, targets in loader:
-        inputs, targets = inputs.to(device), targets.to(device)
+
+        inputs = inputs.to(device)
+        targets = targets.to(device)
 
         optimizer.zero_grad()
+
         outputs = model(inputs)
+
         loss = criterion(outputs, targets)
+
         loss.backward()
+
         optimizer.step()
 
-        _, pred = outputs.max(1)
+        running_loss += loss.item()
+
+        _, predicted = outputs.max(1)
+
         total += targets.size(0)
-        correct += pred.eq(targets).sum().item()
 
-    return 100. * correct / total
+        correct += predicted.eq(targets).sum().item()
+
+    train_acc = 100.0 * correct / total
+    train_loss = running_loss / len(loader)
+
+    return train_loss, train_acc
 
 
-def evaluate(model, loader, device):
+# =========================
+# 4. Evaluation
+# =========================
+def evaluate(model, loader, criterion, device):
+
     model.eval()
-    correct, total = 0, 0
+
+    running_loss = 0
+    correct = 0
+    total = 0
 
     with torch.no_grad():
+
         for inputs, targets in loader:
-            inputs, targets = inputs.to(device), targets.to(device)
+
+            inputs = inputs.to(device)
+            targets = targets.to(device)
+
             outputs = model(inputs)
 
-            _, pred = outputs.max(1)
-            total += targets.size(0)
-            correct += pred.eq(targets).sum().item()
+            loss = criterion(outputs, targets)
 
-    return 100. * correct / total
+            running_loss += loss.item()
+
+            _, predicted = outputs.max(1)
+
+            total += targets.size(0)
+
+            correct += predicted.eq(targets).sum().item()
+
+    test_acc = 100.0 * correct / total
+    test_loss = running_loss / len(loader)
+
+    return test_loss, test_acc
 
 
 # =========================
-# 6. Logging
+# 5. CSV Logging
 # =========================
 def init_csv(path):
-    file = os.path.join(path, "log.csv")
-    with open(file, "w", newline="") as f:
+
+    csv_path = os.path.join(path, "log.csv")
+
+    with open(csv_path, "w", newline="") as f:
+
         writer = csv.writer(f)
+
         writer.writerow([
-            "epoch", "train_acc", "test_acc",
-            "epoch_time", "estimated_total"
+            "epoch",
+            "train_loss",
+            "train_acc",
+            "test_loss",
+            "test_acc",
+            "epoch_time"
         ])
-    return file
+
+    return csv_path
 
 
-def log_csv(file, row):
-    with open(file, "a", newline="") as f:
-        csv.writer(f).writerow(row)
+def log_csv(csv_file, row):
+
+    with open(csv_file, "a", newline="") as f:
+
+        writer = csv.writer(f)
+
+        writer.writerow(row)
 
 
 # =========================
-# 7. Checkpointing
+# 6. Checkpoint Saving
 # =========================
-def save_checkpoint(model, path, name):
-    torch.save(model.state_dict(), os.path.join(path, name))
+def save_checkpoint(model, path, filename):
+
+    torch.save(
+        model.state_dict(),
+        os.path.join(path, filename)
+    )
 
 
 # =========================
-# 8. Main Experiment Runner
+# 7. Main Runner
 # =========================
 def run(main_path):
+
     config = get_config(main_path)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    device = torch.device(
+        "cuda" if torch.cuda.is_available() else "cpu"
+    )
+
     print(f"Using device: {device}")
 
     exp_path = create_experiment_folder(config)
+
     save_config(config, exp_path)
 
     trainloader, testloader = get_dataloaders(config)
 
-    model = SimpleCNN().to(device)
+    model = GoogLeNet(
+        in_channel=3,
+        num_classes=10
+    ).to(device)
+
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=config["learning_rate"])
+
+    optimizer = optim.Adam(
+        model.parameters(),
+        lr=config["learning_rate"]
+    )
 
     csv_file = init_csv(exp_path)
 
     best_acc = 0
-    epoch_times = []
 
-    for epoch in range(1, config["epochs"] + 1):
-        start = time.time()
+    for epoch in range(config["epochs"]):
 
-        train_acc = train_one_epoch(model, trainloader, criterion, optimizer, device)
-        test_acc = evaluate(model, testloader, device)
+        start_time = time.time()
 
-        epoch_time = time.time() - start
-        epoch_times.append(epoch_time)
+        train_loss, train_acc = train_one_epoch(
+            model,
+            trainloader,
+            criterion,
+            optimizer,
+            device
+        )
 
-        avg_time = sum(epoch_times) / len(epoch_times)
-        est_total = avg_time * config["epochs"]
+        test_loss, test_acc = evaluate(
+            model,
+            testloader,
+            criterion,
+            device
+        )
 
-        print(f"[{epoch}/{config['epochs']}] "
-              f"Train: {train_acc:.2f} | Test: {test_acc:.2f} | "
-              f"Time: {epoch_time:.2f}s | Est Total: {est_total:.2f}s")
+        epoch_time = time.time() - start_time
 
-        # Save last checkpoint
-        save_checkpoint(model, exp_path, "last_model.pth")
+        print(
+            f"Epoch [{epoch+1}/{config['epochs']}] | "
+            f"Train Loss: {train_loss:.4f} | "
+            f"Train Acc: {train_acc:.2f}% | "
+            f"Test Loss: {test_loss:.4f} | "
+            f"Test Acc: {test_acc:.2f}% | "
+            f"Time: {epoch_time:.2f}s"
+        )
 
-        # Save best checkpoint
+        save_checkpoint(
+            model,
+            exp_path,
+            "last_model.pth"
+        )
+
         if test_acc > best_acc:
-            best_acc = test_acc
-            save_checkpoint(model, exp_path, "best_model.pth")
 
-        # Log CSV
+            best_acc = test_acc
+
+            save_checkpoint(
+                model,
+                exp_path,
+                "best_model.pth"
+            )
+
+            print(f"New Best Accuracy: {best_acc:.2f}%")
+
         log_csv(csv_file, [
-            epoch, train_acc, test_acc,
-            epoch_time, est_total
+            epoch + 1,
+            train_loss,
+            train_acc,
+            test_loss,
+            test_acc,
+            epoch_time
         ])
 
-    print(f"\nBest Test Accuracy: {best_acc:.2f}%")
-
-
-# if __name__ == "__main__":
-#     run()
+    print(f"\nTraining Finished.")
+    print(f"Best Test Accuracy: {best_acc:.2f}%")

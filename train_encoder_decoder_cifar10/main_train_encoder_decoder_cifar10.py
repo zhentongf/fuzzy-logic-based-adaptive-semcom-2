@@ -14,6 +14,16 @@ from train_encoder_decoder_cifar10.utils.metrics import compute_psnr, compute_ac
 from train_encoder_decoder_cifar10.utils.logger import log_csv
 from train_encoder_decoder_cifar10.utils.time_utils import estimate_total_time
 
+def get_config(main_path):
+    config = {
+        "dataset_path": os.path.join(main_path, "datasets/CIFAR10"),
+        "batch_size": 128,
+        "num_workers": 0,
+        "epochs": 50,
+        "lr": 1e-3
+    }
+    return config
+
 # ---- CLASSIFIER ----
 class SimpleCNN(nn.Module):
     def __init__(self):
@@ -43,13 +53,7 @@ class SimpleCNN(nn.Module):
 def train(main_path, mode="fixed"):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    config = {
-        "dataset_path": os.path.join(main_path, "datasets/CIFAR10"),
-        "batch_size": 128,
-        "num_workers": 4,
-        "epochs": 50,
-        "lr": 1e-3
-    }
+    config = get_config(main_path)
 
     from dataloaders.dataloader_cifar10 import get_dataloaders
     trainloader, testloader = get_dataloaders(config)

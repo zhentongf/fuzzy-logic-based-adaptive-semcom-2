@@ -2,18 +2,40 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 
+
 def get_dataloaders(config):
-    transform = transforms.Compose([
+
+    transform_train = transforms.Compose([
+        transforms.Resize((96, 96)),
+        transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5),
-                             (0.5, 0.5, 0.5))
+        transforms.Normalize(
+            (0.5, 0.5, 0.5),
+            (0.5, 0.5, 0.5)
+        )
+    ])
+
+    transform_test = transforms.Compose([
+        transforms.Resize((96, 96)),
+        transforms.ToTensor(),
+        transforms.Normalize(
+            (0.5, 0.5, 0.5),
+            (0.5, 0.5, 0.5)
+        )
     ])
 
     trainset = torchvision.datasets.CIFAR10(
-        root=config["dataset_path"], train=True, download=True, transform=transform
+        root=config["dataset_path"],
+        train=True,
+        download=True,
+        transform=transform_train
     )
+
     testset = torchvision.datasets.CIFAR10(
-        root=config["dataset_path"], train=False, download=True, transform=transform
+        root=config["dataset_path"],
+        train=False,
+        download=True,
+        transform=transform_test
     )
 
     trainloader = torch.utils.data.DataLoader(

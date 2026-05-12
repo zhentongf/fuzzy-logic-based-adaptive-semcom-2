@@ -5,8 +5,8 @@ import train_encoder_decoder_cifar10.main_train_encoder_decoder_cifar10 as train
 main_path = os.path.dirname(os.path.abspath(__file__))
 def get_main_config():
     config = {
-        "train_cifar10_classification": False,
-        "train_encoder_decoder_cifar10": True,
+        "train_cifar10_classification": True,
+        "train_encoder_decoder_cifar10": False,
         "main_path": main_path
     }
     return config
