@@ -126,4 +126,4 @@ def decide_use_nn(snr_norm: float, dist_norm: float, speed_norm: float) -> bool:
     mu_speed = speed_mem.get_memberships(speed_norm)
     
     semantic, direct = evaluate_rules(mu_snr, mu_dist, mu_speed)
-    return semantic >= direct
+    return semantic > direct + 0.1

@@ -3,35 +3,7 @@ import math
 import pandas as pd
 import numpy as np
 from fuzzy_logic import decide_use_nn
-
-def compute_composite_snr_db(snr_trad_db, distance_m, rel_speed_ms, 
-                             d_ref=1.0, d_min=1.0, 
-                             n=2.0,            # path-loss exponent 
-                             v_ref=10.0,       # reference speed (m/s) 
-                             w_d=1.0, w_v=1.0, # weights for distance and speed penalties 
-                             clip_min_db=-30.0, clip_max_db=40.0): 
-    """ 
-    Returns composite SNR in dB. 
-    snr_trad_db: conventional SNR in dB (float or numpy scalar) 
-    distance_m: distance in meters (float) 
-    rel_speed_ms: relative speed in m/s (can be negative; function uses abs) 
-    Other params are tunable. 
-    """ 
-    # sanitize inputs 
-    d = max(distance_m, d_min) 
-    v = abs(rel_speed_ms) 
-
-    # distance penalty: 10 * n * log10(d / d_ref) scaled by w_d 
-    pen_d_db = w_d * 10.0 * n * np.log10(d / d_ref) 
-
-    # speed penalty: soft-log penalty, scaled by w_v 
-    pen_v_db = w_v * 10.0 * np.log10(1.0 + (v / v_ref)) 
-
-    composite = float(snr_trad_db) - float(pen_d_db) - float(pen_v_db) 
-
-    # clip to avoid extreme values 
-    composite = max(min(composite, clip_max_db), clip_min_db) 
-    return composite 
+from composite_snr import compute_composite_snr_db
 
 def process_nearest_cars_data(start_time=10, end_time=None, input_file="sim_data_two_way.csv", output_file="nearest_cars_data.csv"):
     """
@@ -119,8 +91,8 @@ def process_nearest_cars_data(start_time=10, end_time=None, input_file="sim_data
                 # 归一化计算
                 # SNR: min = -10, max = 40
                 res_row["snr_values_norm"] = (res_row["snr_values"] - (-10)) / (40 - (-10))
-                # Distance: min = 0, max = 100
-                res_row["distance_values_norm"] = (res_row["distance_values"] - 0) / (100 - 0)
+                # Distance: min = 0, max = 200
+                res_row["distance_values_norm"] = (res_row["distance_values"] - 0) / (200 - 0)
                 # Relative speed: min = 0, max = 50
                 res_row["rel_speed_values_norm"] = (res_row["rel_speed_values"] - 0) / (50 - 0)
                 
@@ -166,5 +138,5 @@ def process_nearest_cars_data(start_time=10, end_time=None, input_file="sim_data
     print(f"数据处理完成，结果已保存至 {output_file}")
 
 if __name__ == "__main__":
-    # 示例：从时间点10开始到50结束
-    process_nearest_cars_data(start_time=10, end_time=50)
+    # 示例：从时间点10开始到180结束
+    process_nearest_cars_data(start_time=10, end_time=180)
