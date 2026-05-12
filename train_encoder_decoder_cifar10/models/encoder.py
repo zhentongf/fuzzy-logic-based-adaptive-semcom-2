@@ -1,20 +1,29 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
+
 
 class Encoder(nn.Module):
-    def __init__(self, latent_dim=128):
+
+    def __init__(self, compression_rate=1.0):
         super().__init__()
 
-        self.net = nn.Sequential(
-            nn.Conv2d(3, 32, 3, stride=2, padding=1),  # 16x16
-            nn.ReLU(),
+        self.dimension = int(96 * 96 * 3 * compression_rate / (8 * 8))
 
-            nn.Conv2d(32, 64, 3, stride=2, padding=1), # 8x8
-            nn.ReLU(),
-
-            nn.Flatten(),
-            nn.Linear(64 * 8 * 8, latent_dim)
-        )
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=5, stride=2, padding=0)
+        self.conv2 = nn.Conv2d(64, 128, kernel_size=5, stride=2, padding=0)
+        self.conv3 = nn.Conv2d(128, 256, kernel_size=4, stride=1, padding=0)
+        self.conv4 = nn.Conv2d(256, 384, kernel_size=5, stride=1, padding=0)
+        self.conv5 = nn.Conv2d(384, 512, kernel_size=5, stride=1, padding=0)
+        self.conv6 = nn.Conv2d(512, self.dimension, kernel_size=3, stride=1, padding=0)
 
     def forward(self, x):
-        return self.net(x)
+
+        x = F.relu(self.conv1(x))
+        x = F.relu(self.conv2(x))
+        x = F.relu(self.conv3(x))
+        x = F.relu(self.conv4(x))
+        x = F.relu(self.conv5(x))
+        x = F.relu(self.conv6(x))
+
+        return x
