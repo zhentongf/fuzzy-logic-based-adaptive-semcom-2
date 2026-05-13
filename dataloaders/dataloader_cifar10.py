@@ -27,14 +27,14 @@ def get_dataloaders(config):
     trainset = torchvision.datasets.CIFAR10(
         root=config["dataset_path"],
         train=True,
-        download=True,
+        download=False,
         transform=transform_train
     )
 
     testset = torchvision.datasets.CIFAR10(
         root=config["dataset_path"],
         train=False,
-        download=True,
+        download=False,
         transform=transform_test
     )
 
