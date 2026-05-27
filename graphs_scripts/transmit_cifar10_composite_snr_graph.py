@@ -52,11 +52,11 @@ def plot_composite_snr_analysis(csv_path, output_dir):
     print(f"Saved: {output_path}")
     plt.close()
 
-if __name__ == "__main__":
-    csv_path = r"transmit_cifar10\experiments\transmission_results_20260513_120645.csv"
-    output_dir = "graphs_scripts"
-    
+def draw(main_path):
+    csv_path = os.path.join(main_path, "transmit_cifar10/experiments/transmission_results_20260527_091156.csv")
+    output_dir = os.path.join(main_path, "graphs_scripts")
+
     if os.path.exists(csv_path):
-        plot_composite_snr_analysis(csv_path, output_dir)
+        plot_composite_snr_analysis(csv_path, output_dir)   
     else:
         print(f"Error: CSV file not found at {csv_path}")

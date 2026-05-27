@@ -51,14 +51,14 @@ def plot_training_logs(csv_path1, csv_path2, output_image_path):
     print(f"Graph saved to {output_image_path}")
     plt.close()
 
-if __name__ == "__main__":
-    csv1 = r"train_encoder_decoder_cifar10\experiments\exp_20260512_184610_fixed_snr_20\training_log.csv"
-    csv2 = r"train_encoder_decoder_cifar10\experiments\exp_20260512_202705_dynamic_snr_10to30\training_log.csv"
+def draw(main_path):
+    csv1 = os.path.join(main_path, "train_encoder_decoder_cifar10/experiments/exp_20260526_120001_fixed_snr_10/training_log.csv")
+    csv2 = os.path.join(main_path, "train_encoder_decoder_cifar10/experiments/exp_20260526_140233_dynamic_snr_-10to40/training_log.csv")
     
     # Ensure the script can find the files if run from different locations
     # But here we assume it's run from the project root.
     
-    output_dir = "graphs_scripts"
+    output_dir = os.path.join(main_path, "graphs_scripts")
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
         

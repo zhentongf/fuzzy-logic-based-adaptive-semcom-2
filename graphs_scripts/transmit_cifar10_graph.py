@@ -42,9 +42,32 @@ def plot_transmission_comparison(csv_path, output_dir):
         if case_df.empty:
             continue
             
-        # Group by bin and calculate mean
-        stats = case_df.groupby('dist_mid', observed=False)['psnr'].mean().sort_index()
-        ax1.plot(stats.index, stats.values, label=case, color=colors[i], marker=markers[i], linestyle='-', linewidth=2)
+        
+        # Group by bin and calculate statistics
+        stats = case_df.groupby('dist_mid', observed=False)['psnr'].agg(['mean', 'std', 'count']).sort_index()
+
+        # Calculate 95% confidence interval
+        ci = 1.96 * (stats['std'] / np.sqrt(stats['count']))
+
+        # Plot mean line
+        ax1.plot(
+            stats.index,
+            stats['mean'],
+            label=case,
+            color=colors[i],
+            marker=markers[i],
+            linestyle='-',
+            linewidth=2
+        )
+
+        # Plot confidence interval shading
+        ax1.fill_between(
+            stats.index,
+            stats['mean'] - ci,
+            stats['mean'] + ci,
+            color=colors[i],
+            alpha=0.2
+        )
 
     ax1.set_xlabel('Distance (m) [Binned per 10m]')
     ax1.set_ylabel('Mean PSNR (dB)')
@@ -58,9 +81,32 @@ def plot_transmission_comparison(csv_path, output_dir):
         if case_df.empty:
             continue
             
-        # Group by bin and calculate mean
-        stats = case_df.groupby('speed_mid', observed=False)['psnr'].mean().sort_index()
-        ax2.plot(stats.index, stats.values, label=case, color=colors[i], marker=markers[i], linestyle='-', linewidth=2)
+        
+        # Group by bin and calculate statistics
+        stats = case_df.groupby('speed_mid', observed=False)['psnr'].agg(['mean', 'std', 'count']).sort_index()
+
+        # Calculate 95% confidence interval
+        ci = 1.96 * (stats['std'] / np.sqrt(stats['count']))
+
+        # Plot mean line
+        ax2.plot(
+            stats.index,
+            stats['mean'],
+            label=case,
+            color=colors[i],
+            marker=markers[i],
+            linestyle='-',
+            linewidth=2
+        )
+
+        # Plot confidence interval shading
+        ax2.fill_between(
+            stats.index,
+            stats['mean'] - ci,
+            stats['mean'] + ci,
+            color=colors[i],
+            alpha=0.2
+        )
 
     ax2.set_xlabel('Relative Speed (m/s) [Binned per 10m/s]')
     ax2.set_ylabel('Mean PSNR (dB)')
@@ -74,9 +120,9 @@ def plot_transmission_comparison(csv_path, output_dir):
     print(f"Saved: {output_path}")
     plt.close()
 
-if __name__ == "__main__":
-    csv_path = r"transmit_cifar10\experiments\transmission_results_20260513_120645.csv"
-    output_dir = "graphs_scripts"
+def draw(main_path):
+    csv_path = os.path.join(main_path, "transmit_cifar10/experiments/transmission_results_20260527_091156.csv")
+    output_dir = os.path.join(main_path, "graphs_scripts")
     
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)

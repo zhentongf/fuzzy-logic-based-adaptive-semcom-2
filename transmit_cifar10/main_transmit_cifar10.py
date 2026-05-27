@@ -49,7 +49,7 @@ def get_config(main_path):
             main_path,
             "train_encoder_decoder_cifar10",
             "experiments",
-            "exp_20260512_184610_fixed_snr_20",
+            "exp_20260526_120001_fixed_snr_10",
             "encoder_final.pth"
         ),
 
@@ -57,7 +57,7 @@ def get_config(main_path):
             main_path,
             "train_encoder_decoder_cifar10",
             "experiments",
-            "exp_20260512_184610_fixed_snr_20",
+            "exp_20260526_120001_fixed_snr_10",
             "decoder_final.pth"
         ),
 
@@ -66,7 +66,7 @@ def get_config(main_path):
             main_path,
             "train_encoder_decoder_cifar10",
             "experiments",
-            "exp_20260512_202705_dynamic_snr_10to30",
+            "exp_20260526_140233_dynamic_snr_-10to40",
             "encoder_final.pth"
         ),
 
@@ -74,7 +74,7 @@ def get_config(main_path):
             main_path,
             "train_encoder_decoder_cifar10",
             "experiments",
-            "exp_20260512_202705_dynamic_snr_10to30",
+            "exp_20260526_140233_dynamic_snr_-10to40",
             "decoder_final.pth"
         ),
 

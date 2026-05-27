@@ -3,3 +3,7 @@ __pycache__
 *.pyc
 debug.log
 *.xlsx
+IEEE-Transactions-LaTeX2e-templates-and-instructions*
+*.aux
+*.log
+*.synctex.gz

@@ -138,5 +138,5 @@ def process_nearest_cars_data(start_time=10, end_time=None, input_file="sim_data
     print(f"数据处理完成，结果已保存至 {output_file}")
 
 if __name__ == "__main__":
-    # 示例：从时间点10开始到180结束
-    process_nearest_cars_data(start_time=10, end_time=180)
+    # 示例：从时间点10开始到160结束
+    process_nearest_cars_data(start_time=10, end_time=160)
