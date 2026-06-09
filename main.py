@@ -5,6 +5,7 @@ import transmit_cifar10.main_transmit_cifar10 as transmit_cifar10
 
 import train_mnist_classification.main_train_mnist_classification as train_mnist_classification
 import train_encoder_decoder_mnist.main_train_encoder_decoder_mnist as train_encoder_decoder_mnist
+import transmit_mnist.main_transmit_mnist as transmit_mnist
 
 
 main_path = os.path.dirname(os.path.abspath(__file__))
@@ -14,7 +15,8 @@ def get_main_config():
         "train_encoder_decoder_cifar10": False,
         "transmit_cifar10": False,
         "train_mnist_classification": False,
-        "train_encoder_decoder_mnist": True,
+        "train_encoder_decoder_mnist": False,
+        "transmit_mnist": True,
         "main_path": main_path
     }
     return config
@@ -59,6 +61,10 @@ def main():
             config["main_path"],
             mode="dynamic"
        )
+    if config["transmit_mnist"]:
+        print("Starting MNIST transmission...")
+        transmit_mnist.run(config["main_path"])
+
 
 
 
