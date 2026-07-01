@@ -7,3 +7,4 @@ IEEE-Transactions-LaTeX2e-templates-and-instructions*
 *.aux
 *.log
 *.synctex.gz
+.vscode

@@ -53,7 +53,7 @@ def plot_composite_snr_analysis(csv_path, output_dir):
     plt.close()
 
 def draw(main_path):
-    csv_path = os.path.join(main_path, "transmit_mnist/experiments/transmission_results_20260610_045418.csv")
+    csv_path = os.path.join(main_path, "transmit_mnist/experiments/transmission_results_20260701_023433_noise_0.6.csv")
     output_dir = os.path.join(main_path, "graphs_scripts")
 
     if os.path.exists(csv_path):

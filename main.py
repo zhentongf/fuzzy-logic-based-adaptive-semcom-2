@@ -7,6 +7,8 @@ import train_mnist_classification.main_train_mnist_classification as train_mnist
 import train_encoder_decoder_mnist.main_train_encoder_decoder_mnist as train_encoder_decoder_mnist
 import transmit_mnist.main_transmit_mnist as transmit_mnist
 
+import reward_prediction_network.main_train_reward_prediction_network as train_reward_prediction_network
+
 
 main_path = os.path.dirname(os.path.abspath(__file__))
 def get_main_config():
@@ -16,7 +18,8 @@ def get_main_config():
         "transmit_cifar10": False,
         "train_mnist_classification": False,
         "train_encoder_decoder_mnist": False,
-        "transmit_mnist": True,
+        "transmit_mnist": False,
+        "train_reward_prediction_network": True,
         "main_path": main_path
     }
     return config
@@ -65,6 +68,9 @@ def main():
         print("Starting MNIST transmission...")
         transmit_mnist.run(config["main_path"])
 
+    if config["train_reward_prediction_network"]:
+        print("Starting reward prediction network training...")
+        train_reward_prediction_network.train(config["main_path"])
 
 
 

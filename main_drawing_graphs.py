@@ -13,8 +13,8 @@ main_path = os.path.dirname(os.path.abspath(__file__))
 def get_main_config():
     config = {
         "train_encoder_decoder_cifar10_graph": False,
-        "transmit_cifar10_composite_snr_graph": False,
-        "transmit_cifar10_graph": False,
+        "transmit_cifar10_composite_snr_graph": True,
+        "transmit_cifar10_graph": True,
         "train_encoder_decoder_mnist_graph": False,
         "transmit_mnist_composite_snr_graph": True,
         "transmit_mnist_graph": True,
