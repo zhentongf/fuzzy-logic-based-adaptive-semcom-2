@@ -15,11 +15,11 @@ def get_main_config():
     config = {
         "train_cifar10_classification": False,
         "train_encoder_decoder_cifar10": False,
-        "transmit_cifar10": False,
+        "transmit_cifar10": True,
         "train_mnist_classification": False,
         "train_encoder_decoder_mnist": False,
-        "transmit_mnist": False,
-        "train_reward_prediction_network": True,
+        "transmit_mnist": True,
+        "train_reward_prediction_network": False,
         "main_path": main_path
     }
     return config

@@ -15,11 +15,12 @@ def plot_composite_snr_analysis(csv_path, output_dir):
         'fuzzy_logic_fixed_snr',
         'fuzzy_logic_dynamic_snr',
         'all_dynamic_snr',
-        'all_direct'
+        'all_direct',
+        'deep_learning_adaptive'
     ]
     
-    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']
-    markers = ['o', 's', '^', 'D']
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
+    markers = ['o', 's', '^', 'D', 'd']
 
     plt.figure(figsize=(12, 8))
     
@@ -53,7 +54,7 @@ def plot_composite_snr_analysis(csv_path, output_dir):
     plt.close()
 
 def draw(main_path):
-    csv_path = os.path.join(main_path, "transmit_mnist/experiments/transmission_results_20260701_095411_noise_0.8.csv")
+    csv_path = os.path.join(main_path, "transmit_mnist/experiments/transmission_results_20260708_022806_noise_0.6.csv")
     output_dir = os.path.join(main_path, "graphs_scripts")
 
     if os.path.exists(csv_path):

@@ -2,7 +2,9 @@ import os
 import random
 import datetime
 import pandas as pd
+import numpy as np
 import torch
+import joblib
 from torch.utils.data import DataLoader, Subset
 
 from dataloaders.dataloader_cifar10 import get_dataloaders
@@ -17,6 +19,8 @@ from train_encoder_decoder_cifar10.utils.metrics import (
     compute_psnr,
     compute_accuracy
 )
+
+from reward_prediction_network.model import RewardPredictionNetwork
 
 
 def get_config(main_path):
@@ -76,6 +80,21 @@ def get_config(main_path):
             "experiments",
             "exp_20260526_140233_dynamic_snr_-10to40",
             "decoder_final.pth"
+        ),
+
+        # reward prediction network
+        "reward_model_path": os.path.join(
+            main_path,
+            "reward_prediction_network",
+            "noise_0.6",
+            "reward_prediction_network.pth"
+        ),
+
+        "state_scaler_path": os.path.join(
+            main_path,
+            "reward_prediction_network",
+            "noise_0.6",
+            "state_scaler.pkl"
         ),
 
         # experiment output
@@ -208,6 +227,24 @@ def direct_transmission(
     return noisy_images
 
 
+def predict_reward(
+    reward_model,
+    scaler,
+    snr,
+    distance,
+    rel_speed,
+    device
+):
+    state = np.array([[snr, distance, rel_speed]])
+    state = scaler.transform(state)
+    state = torch.FloatTensor(state).to(device)
+
+    with torch.no_grad():
+        reward = reward_model(state)
+
+    return reward.item()
+
+
 def evaluate_transmission(
     dataloader,
     classifier,
@@ -218,6 +255,11 @@ def evaluate_transmission(
     fixed_decoder,
     dynamic_encoder,
     dynamic_decoder,
+    reward_model,
+    state_scaler,
+    snr,
+    distance,
+    rel_speed,
     device
 ):
 
@@ -293,6 +335,32 @@ def evaluate_transmission(
                     images,
                     composite_snr_db
                 )
+
+            # ==================================================
+            # CASE 5
+            # deep learning adaptive
+            # ==================================================
+            elif mode == "deep_learning_adaptive":
+                reward = predict_reward(
+                    reward_model,
+                    state_scaler,
+                    snr,
+                    distance,
+                    rel_speed,
+                    device
+                )
+                if reward > 0:
+                    outputs = semantic_transmission(
+                        images,
+                        dynamic_encoder,
+                        dynamic_decoder,
+                        composite_snr_db
+                    )
+                else:
+                    outputs = direct_transmission(
+                        images,
+                        composite_snr_db
+                    )
 
             else:
                 raise ValueError(f"Unknown mode: {mode}")
@@ -370,6 +438,22 @@ def run(main_path):
         device
     )
 
+    print("Loading reward prediction network...")
+
+    reward_model = RewardPredictionNetwork()
+    reward_model.load_state_dict(
+        torch.load(
+            config["reward_model_path"],
+            map_location=device
+        )
+    )
+    reward_model.eval()
+    reward_model.to(device)
+
+    state_scaler = joblib.load(
+        config["state_scaler_path"]
+    )
+
     # ======================================================
     # load CIFAR10 test subset
     # ======================================================
@@ -406,7 +490,8 @@ def run(main_path):
         "fuzzy_logic_fixed_snr",
         "fuzzy_logic_dynamic_snr",
         "all_dynamic_snr",
-        "all_direct"
+        "all_direct",
+        "deep_learning_adaptive"
     ]
 
     results = []
@@ -431,6 +516,18 @@ def run(main_path):
                 row["use_nn"]
             )
 
+            snr = float(
+                row["snr_values"]
+            )
+
+            distance = float(
+                row["distance_values"]
+            )
+
+            rel_speed = float(
+                row["rel_speed_values"]
+            )
+
             avg_psnr, avg_acc = evaluate_transmission(
                 dataloader=testloader,
                 classifier=classifier,
@@ -441,6 +538,11 @@ def run(main_path):
                 fixed_decoder=fixed_decoder,
                 dynamic_encoder=dynamic_encoder,
                 dynamic_decoder=dynamic_decoder,
+                reward_model=reward_model,
+                state_scaler=state_scaler,
+                snr=snr,
+                distance=distance,
+                rel_speed=rel_speed,
                 device=device
             )
 

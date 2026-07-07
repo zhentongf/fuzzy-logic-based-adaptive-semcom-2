@@ -1,3 +1,5 @@
+import torch.nn as nn
+
 # Reward Prediction Network
 class RewardPredictionNetwork(nn.Module):
 
