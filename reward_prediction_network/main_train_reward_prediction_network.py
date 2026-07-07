@@ -12,19 +12,44 @@ from sklearn.metrics import mean_squared_error
 import joblib
 import os
 
+from reward_prediction_network.model import RewardPredictionNetwork
 
 def train(main_path):
     # Configuration
-    CSV_FILE = os.path.join(main_path, "transmit_cifar10/experiments/transmission_results_20260701_021626_noise_0.6.csv")
+    CSV_FILES = [
+        os.path.join(
+            main_path,
+            "transmit_cifar10/experiments/transmission_results_20260701_021626_noise_0.6.csv"
+        ),
+        os.path.join(
+            main_path,
+            "transmit_mnist/experiments/transmission_results_20260701_023433_noise_0.6.csv"
+        )
+    ]
 
     PSNR_WEIGHT = 0.7
     ACC_WEIGHT = 0.3
 
     EPOCHS = 500
     LEARNING_RATE = 1e-3
+    
+    # Load and combine all CSV files
+    df_list = []
 
-    # Load CSV
-    df = pd.read_csv(CSV_FILE)
+    for csv_file in CSV_FILES:
+        temp_df = pd.read_csv(csv_file)
+
+        # Optional: record which dataset each row comes from
+        temp_df["dataset"] = os.path.basename(csv_file)
+
+        df_list.append(temp_df)
+
+    df = pd.concat(
+        df_list,
+        ignore_index=True
+    )
+
+    print(f"Total samples: {len(df)}")
 
     # Separate Cases
     semantic_df = df[
@@ -160,31 +185,6 @@ def train(main_path):
     y_test = torch.FloatTensor(
         y_test.reshape(-1, 1)
     )
-
-    # Reward Prediction Network
-    class RewardPredictionNetwork(nn.Module):
-
-        def __init__(self):
-
-            super().__init__()
-
-            self.net = nn.Sequential(
-
-                nn.Linear(3, 64),
-                nn.ReLU(),
-
-                nn.Linear(64, 64),
-                nn.ReLU(),
-
-                nn.Linear(64, 32),
-                nn.ReLU(),
-
-                nn.Linear(32, 1)
-            )
-
-        def forward(self, x):
-
-            return self.net(x)
 
     # Create Model
     model = RewardPredictionNetwork()
