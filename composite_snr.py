@@ -5,7 +5,7 @@ def compute_composite_snr_db(snr_trad_db, distance_m, rel_speed_ms,
                              d_ref=1.0, d_min=0.1, 
                              n=2.0,            # path-loss exponent 
                              v_ref=10.0,       # reference speed (m/s) 
-                             w_d=0.6, w_v=0.6, # weights for distance and speed penalties 
+                             w_d=0.8, w_v=0.8, # weights for distance and speed penalties 
                              clip_min_db=-30.0, clip_max_db=40.0): 
     """ 
     Returns composite SNR in dB. 

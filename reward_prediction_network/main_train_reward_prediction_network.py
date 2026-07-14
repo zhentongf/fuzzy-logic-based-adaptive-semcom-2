@@ -19,11 +19,11 @@ def train(main_path):
     CSV_FILES = [
         os.path.join(
             main_path,
-            "transmit_cifar10/experiments/transmission_results_20260701_021626_noise_0.6.csv"
+            "transmit_cifar10/experiments/transmission_results_20260527_091156.csv"
         ),
         os.path.join(
             main_path,
-            "transmit_mnist/experiments/transmission_results_20260701_023433_noise_0.6.csv"
+            "transmit_mnist/experiments/transmission_results_20260610_045418.csv"
         )
     ]
 
@@ -132,7 +132,7 @@ def train(main_path):
             "psnr_base": psnr_base,
             "acc_base": acc_base
         },
-        os.path.join(main_path, "reward_prediction_network/noise_0.6/reward_normalization.pkl")
+        os.path.join(main_path, "reward_prediction_network/reward_normalization.pkl")
     )
 
     # Build Reward
@@ -163,7 +163,7 @@ def train(main_path):
 
     joblib.dump(
         scaler,
-        os.path.join(main_path, "reward_prediction_network/noise_0.6/state_scaler.pkl")
+        os.path.join(main_path, "reward_prediction_network/state_scaler.pkl")
     )
 
     # Train/Test Split
@@ -239,7 +239,7 @@ def train(main_path):
     # Save Model
     torch.save(
         model.state_dict(),
-        os.path.join(main_path, "reward_prediction_network/noise_0.6/reward_prediction_network.pth")
+        os.path.join(main_path, "reward_prediction_network/reward_prediction_network.pth")
     )
 
     print("Model saved.")

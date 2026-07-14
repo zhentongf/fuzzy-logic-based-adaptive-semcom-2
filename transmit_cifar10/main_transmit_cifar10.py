@@ -86,14 +86,14 @@ def get_config(main_path):
         "reward_model_path": os.path.join(
             main_path,
             "reward_prediction_network",
-            "noise_0.6",
+            "noise_0.8",
             "reward_prediction_network.pth"
         ),
 
         "state_scaler_path": os.path.join(
             main_path,
             "reward_prediction_network",
-            "noise_0.6",
+            "noise_0.8",
             "state_scaler.pkl"
         ),
 
