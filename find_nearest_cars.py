@@ -93,8 +93,8 @@ def process_nearest_cars_data(start_time=10, end_time=None, input_file="sim_data
                 res_row["snr_values_norm"] = (res_row["snr_values"] - (-10)) / (40 - (-10))
                 # Distance: min = 0, max = 200
                 res_row["distance_values_norm"] = (res_row["distance_values"] - 0) / (200 - 0)
-                # Relative speed: min = 0, max = 50
-                res_row["rel_speed_values_norm"] = (res_row["rel_speed_values"] - 0) / (50 - 0)
+                # Relative speed: min = 0, max = 100
+                res_row["rel_speed_values_norm"] = (res_row["rel_speed_values"] - 0) / (100 - 0)
                 
                 # 计算复合 SNR
                 res_row["composite_snr_db"] = compute_composite_snr_db(
