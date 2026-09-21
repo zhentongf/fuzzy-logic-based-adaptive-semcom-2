@@ -20,7 +20,7 @@ from train_encoder_decoder_cifar10.utils.metrics import (
     compute_accuracy
 )
 
-from reward_prediction_network.model import RewardPredictionNetwork
+# from reward_prediction_network.model import RewardPredictionNetwork
 
 
 def get_config(main_path):
@@ -83,19 +83,19 @@ def get_config(main_path):
         ),
 
         # reward prediction network
-        "reward_model_path": os.path.join(
-            main_path,
-            "reward_prediction_network",
-            "noise_1.0",
-            "reward_prediction_network.pth"
-        ),
+        # "reward_model_path": os.path.join(
+        #     main_path,
+        #     "reward_prediction_network",
+        #     "noise_1.0",
+        #     "reward_prediction_network.pth"
+        # ),
 
-        "state_scaler_path": os.path.join(
-            main_path,
-            "reward_prediction_network",
-            "noise_1.0",
-            "state_scaler.pkl"
-        ),
+        # "state_scaler_path": os.path.join(
+        #     main_path,
+        #     "reward_prediction_network",
+        #     "noise_1.0",
+        #     "state_scaler.pkl"
+        # ),
 
         # experiment output
         "experiment_dir": os.path.join(
@@ -255,8 +255,8 @@ def evaluate_transmission(
     fixed_decoder,
     dynamic_encoder,
     dynamic_decoder,
-    reward_model,
-    state_scaler,
+    # reward_model,
+    # state_scaler,
     snr,
     distance,
     rel_speed,
@@ -340,27 +340,27 @@ def evaluate_transmission(
             # CASE 5
             # deep learning adaptive
             # ==================================================
-            elif mode == "deep_learning_adaptive":
-                reward = predict_reward(
-                    reward_model,
-                    state_scaler,
-                    snr,
-                    distance,
-                    rel_speed,
-                    device
-                )
-                if reward > 0:
-                    outputs = semantic_transmission(
-                        images,
-                        dynamic_encoder,
-                        dynamic_decoder,
-                        composite_snr_db
-                    )
-                else:
-                    outputs = direct_transmission(
-                        images,
-                        composite_snr_db
-                    )
+            # elif mode == "deep_learning_adaptive":
+            #     reward = predict_reward(
+            #         reward_model,
+            #         state_scaler,
+            #         snr,
+            #         distance,
+            #         rel_speed,
+            #         device
+            #     )
+            #     if reward > 0:
+            #         outputs = semantic_transmission(
+            #             images,
+            #             dynamic_encoder,
+            #             dynamic_decoder,
+            #             composite_snr_db
+            #         )
+            #     else:
+            #         outputs = direct_transmission(
+            #             images,
+            #             composite_snr_db
+            #         )
 
             else:
                 raise ValueError(f"Unknown mode: {mode}")
@@ -438,21 +438,21 @@ def run(main_path):
         device
     )
 
-    print("Loading reward prediction network...")
+    # print("Loading reward prediction network...")
 
-    reward_model = RewardPredictionNetwork()
-    reward_model.load_state_dict(
-        torch.load(
-            config["reward_model_path"],
-            map_location=device
-        )
-    )
-    reward_model.eval()
-    reward_model.to(device)
+    # reward_model = RewardPredictionNetwork()
+    # reward_model.load_state_dict(
+    #     torch.load(
+    #         config["reward_model_path"],
+    #         map_location=device
+    #     )
+    # )
+    # reward_model.eval()
+    # reward_model.to(device)
 
-    state_scaler = joblib.load(
-        config["state_scaler_path"]
-    )
+    # state_scaler = joblib.load(
+    #     config["state_scaler_path"]
+    # )
 
     # ======================================================
     # load CIFAR10 test subset
@@ -490,8 +490,8 @@ def run(main_path):
         "fuzzy_logic_fixed_snr",
         "fuzzy_logic_dynamic_snr",
         "all_dynamic_snr",
-        "all_direct",
-        "deep_learning_adaptive"
+        "all_direct"
+        # "deep_learning_adaptive"
     ]
 
     results = []
@@ -538,8 +538,8 @@ def run(main_path):
                 fixed_decoder=fixed_decoder,
                 dynamic_encoder=dynamic_encoder,
                 dynamic_decoder=dynamic_decoder,
-                reward_model=reward_model,
-                state_scaler=state_scaler,
+                # reward_model=reward_model,
+                # state_scaler=state_scaler,
                 snr=snr,
                 distance=distance,
                 rel_speed=rel_speed,
