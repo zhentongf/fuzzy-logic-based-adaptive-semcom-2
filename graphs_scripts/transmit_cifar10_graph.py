@@ -122,7 +122,7 @@ def plot_transmission_comparison(csv_path, output_dir):
     plt.close()
 
 def draw(main_path):
-    csv_path = os.path.join(main_path, "transmit_cifar10/experiments/transmission_results_20260714_164239_noise_1.0.csv")
+    csv_path = os.path.join(main_path, "transmit_cifar10/experiments/transmission_results_20260922_064225_noise_0.8.csv")
     output_dir = os.path.join(main_path, "graphs_scripts")
     
     if not os.path.exists(output_dir):

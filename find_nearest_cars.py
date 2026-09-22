@@ -5,7 +5,36 @@ import numpy as np
 from fuzzy_logic import decide_use_nn
 from composite_snr import compute_composite_snr_db
 
-def process_nearest_cars_data(start_time=10, end_time=None, input_file="sim_data_two_way.csv", output_file="nearest_cars_data.csv"):
+
+def get_velocity_vector(speed, direction):
+    """
+    将方向编码转换为二维速度向量。
+    方向编码约定：
+    0=西，1=北，2=东，3=南
+    """
+    direction_vectors = {
+        0: (-1.0, 0.0),
+        1: (0.0, 1.0),
+        2: (1.0, 0.0),
+        3: (0.0, -1.0)
+    }
+
+    unit_vector = direction_vectors.get(int(direction))
+    if unit_vector is None:
+        raise ValueError(f"未知方向编码: {direction}")
+
+    return speed * unit_vector[0], speed * unit_vector[1]
+
+
+def compute_relative_speed(tx_speed, tx_dir, rx_speed, rx_dir):
+    """按二维速度向量计算相对速度大小。"""
+    tx_vx, tx_vy = get_velocity_vector(tx_speed, tx_dir)
+    rx_vx, rx_vy = get_velocity_vector(rx_speed, rx_dir)
+
+    return math.sqrt((tx_vx - rx_vx) ** 2 + (tx_vy - rx_vy) ** 2)
+
+
+def process_nearest_cars_data(start_time=10, end_time=None, input_file="sim_data_two_way_round_square.csv", output_file="nearest_cars_data.csv"):
     """
     在指定的 [start_time, end_time] 时间范围内，针对v1-v4一共4辆车，分别找到距离最近的5辆车，
     计算出相关的SNR、距离、相对速度、归一化数据、复合SNR和是否使用NN，并保存为CSV。
@@ -71,12 +100,12 @@ def process_nearest_cars_data(start_time=10, end_time=None, input_file="sim_data
                 dist = rx_row['dist']
                 
                 # 计算相对速度
-                # 如果方向相同：|A - B|
-                # 如果方向相反：|A - (-B)| = |A + B|
-                if tx_dir == rx_dir:
-                    rel_speed = abs(tx_speed - rx_speed)
-                else:
-                    rel_speed = abs(tx_speed + rx_speed)
+                rel_speed = compute_relative_speed(
+                    tx_speed=tx_speed,
+                    tx_dir=tx_dir,
+                    rx_speed=rx_speed,
+                    rx_dir=rx_dir
+                )
                 
                 # 记录原始值
                 res_row = {
@@ -138,5 +167,5 @@ def process_nearest_cars_data(start_time=10, end_time=None, input_file="sim_data
     print(f"数据处理完成，结果已保存至 {output_file}")
 
 if __name__ == "__main__":
-    # 示例：从时间点10开始到160结束
-    process_nearest_cars_data(start_time=10, end_time=160)
+    # 示例：从时间点10开始处理环形路径数据
+    process_nearest_cars_data(start_time=10, end_time=140)
