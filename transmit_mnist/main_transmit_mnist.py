@@ -278,7 +278,7 @@ def evaluate_transmission(
 
                     outputs = direct_transmission(
                         images,
-                        composite_snr_db
+                        snr
                     )
 
             # ==========================================
@@ -299,7 +299,7 @@ def evaluate_transmission(
 
                     outputs = direct_transmission(
                         images,
-                        composite_snr_db
+                        snr
                     )
 
             # ==========================================
@@ -322,7 +322,7 @@ def evaluate_transmission(
 
                 outputs = direct_transmission(
                     images,
-                    composite_snr_db
+                    snr
                 )
 
             # ==========================================
