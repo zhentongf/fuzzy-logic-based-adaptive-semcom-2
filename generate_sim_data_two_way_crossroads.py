@@ -64,7 +64,7 @@ def generate_car_sim_data_crossroads(number_cars=20, road_length=2000, road_widt
 
     cars = []
     speeds_pool = [10, 20, 30, 40, 50]
-    snr_pool = [20, 30, 40]
+    snr_pool = [5, 10, 15, 20]
     random.seed(42)
 
     routes = [
@@ -82,7 +82,7 @@ def generate_car_sim_data_crossroads(number_cars=20, road_length=2000, road_widt
             distance=0,
             road_length=road_length
         )
-        snr = random.choice(snr_pool)
+        snr = snr_pool[i % len(snr_pool)]
 
         cars.append({
             "car_ID": car_id,

@@ -48,7 +48,10 @@ def main():
 
     if config["transmit_cifar10"]:
         print("Starting CIFAR-10 transmission...")
-        transmit_cifar10.run(config["main_path"])
+        transmit_cifar10.run(config["main_path"], "nearest_cars_csv")
+        transmit_cifar10.run(config["main_path"], "parallel_cars_csv")
+        transmit_cifar10.run(config["main_path"], "best_cars_by_fuzzy_logic_csv")
+        transmit_cifar10.run(config["main_path"], "random_cars_csv")
 
     if config["train_mnist_classification"]:
         print("Starting MNIST classification training...")
@@ -66,7 +69,10 @@ def main():
        )
     if config["transmit_mnist"]:
         print("Starting MNIST transmission...")
-        transmit_mnist.run(config["main_path"])
+        transmit_mnist.run(config["main_path"], "nearest_cars_csv")
+        transmit_mnist.run(config["main_path"], "parallel_cars_csv")
+        transmit_mnist.run(config["main_path"], "best_cars_by_fuzzy_logic_csv")
+        transmit_mnist.run(config["main_path"], "random_cars_csv")
 
     # if config["train_reward_prediction_network"]:
     #     print("Starting reward prediction network training...")

@@ -52,6 +52,18 @@ def get_config(main_path):
             main_path,
             "nearest_cars_data.csv"
         ),
+        "parallel_cars_csv": os.path.join(
+            main_path,
+            "parallel_cars_data.csv"
+        ),
+        "best_cars_by_fuzzy_logic_csv": os.path.join(
+            main_path,
+            "best_cars_by_fuzzy_logic_data.csv"
+        ),
+        "random_cars_csv": os.path.join(
+            main_path,
+            "random_cars_data.csv"
+        ),
 
         # classifier
         "classifier_model_path": os.path.join(
@@ -103,7 +115,7 @@ def get_config(main_path):
         ),
 
         "compression_rate": 1.0,
-        "num_test_images": 1000
+        "num_test_images": 100
     }
 
     return config
@@ -377,7 +389,7 @@ def evaluate_transmission(
     return avg_psnr, avg_acc
 
 
-def run(main_path):
+def run(main_path, csv_file):
 
     config = get_config(main_path)
 
@@ -451,10 +463,10 @@ def run(main_path):
     # nearest cars data
     # ==================================================
 
-    print("Loading nearest_cars_data.csv ...")
+    print(f"Loading {csv_file} ...")
 
     df = pd.read_csv(
-        config["nearest_cars_csv"]
+        config[csv_file]
     )
 
     df = df[

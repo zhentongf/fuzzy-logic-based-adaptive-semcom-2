@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 
-def plot_transmission_comparison(csv_path, output_dir):
+def plot_transmission_comparison(csv_path, output_dir, csv_file):
     # Load data
     df = pd.read_csv(csv_path)
     
@@ -34,7 +34,7 @@ def plot_transmission_comparison(csv_path, output_dir):
     colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
     markers = ['o', 's', '^', 'D', 'd']
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 7))
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(24, 7))
     fig.suptitle('Transmission Performance Comparison (Binned Analysis)', fontsize=16)
 
     # Subplot 1: PSNR vs Distance
@@ -115,20 +115,53 @@ def plot_transmission_comparison(csv_path, output_dir):
     ax2.grid(True, linestyle='--', alpha=0.7)
     ax2.legend()
 
+    # Subplot 3: PSNR vs SNR
+    for i, case in enumerate(cases):
+        case_df = df[df['testing_case'] == case]
+        if case_df.empty:
+            continue
+
+        stats = case_df.groupby('snr_values', observed=False)['psnr'].agg(['mean', 'std', 'count']).sort_index()
+        ci = 1.96 * (stats['std'].fillna(0) / np.sqrt(stats['count']))
+
+        ax3.plot(
+            stats.index,
+            stats['mean'],
+            label=case,
+            color=colors[i],
+            marker=markers[i],
+            linestyle='-',
+            linewidth=2
+        )
+
+        ax3.fill_between(
+            stats.index,
+            stats['mean'] - ci,
+            stats['mean'] + ci,
+            color=colors[i],
+            alpha=0.2
+        )
+
+    ax3.set_xlabel('SNR (dB)')
+    ax3.set_ylabel('Mean PSNR (dB)')
+    ax3.set_title('PSNR vs SNR')
+    ax3.grid(True, linestyle='--', alpha=0.7)
+    ax3.legend()
+
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-    output_path = os.path.join(output_dir, "transmission_comparison_binned.png")
+    output_path = os.path.join(output_dir, f"transmission_comparison_binned_cifar10_{csv_file}.png")
     plt.savefig(output_path, dpi=300)
     print(f"Saved: {output_path}")
     plt.close()
 
-def draw(main_path):
-    csv_path = os.path.join(main_path, "transmit_cifar10/experiments/transmission_results_20260929_042444_noise_0.8.csv")
+def draw(main_path, csv_file):
+    csv_path = os.path.join(main_path, "transmit_cifar10/experiments", csv_file)
     output_dir = os.path.join(main_path, "graphs_scripts")
     
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
     if os.path.exists(csv_path):
-        plot_transmission_comparison(csv_path, output_dir)
+        plot_transmission_comparison(csv_path, output_dir, csv_file)
     else:
         print(f"Error: CSV file not found at {csv_path}")

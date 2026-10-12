@@ -34,7 +34,7 @@ def compute_relative_speed(tx_speed, tx_dir, rx_speed, rx_dir):
     return math.sqrt((tx_vx - rx_vx) ** 2 + (tx_vy - rx_vy) ** 2)
 
 
-def process_nearest_cars_data(start_time=10, end_time=None, input_file="sim_data_two_way_round_square.csv", output_file="nearest_cars_data.csv"):
+def process_nearest_cars_data(start_time=10, end_time=None, input_file="sim_data_two_way_crossroads.csv", output_file="nearest_cars_data.csv"):
     """
     在指定的 [start_time, end_time] 时间范围内，针对v1-v4一共4辆车，分别找到距离最近的5辆车，
     计算出相关的SNR、距离、相对速度、归一化数据、复合SNR和是否使用NN，并保存为CSV。
@@ -118,8 +118,8 @@ def process_nearest_cars_data(start_time=10, end_time=None, input_file="sim_data
                 }
                 
                 # 归一化计算
-                # SNR: min = -10, max = 40
-                res_row["snr_values_norm"] = (res_row["snr_values"] - (-10)) / (40 - (-10))
+                # SNR: min = -10, max = 20
+                res_row["snr_values_norm"] = (res_row["snr_values"] - (-10)) / (20 - (-10))
                 # Distance: min = 0, max = 200
                 res_row["distance_values_norm"] = (res_row["distance_values"] - 0) / (200 - 0)
                 # Relative speed: min = 0, max = 100
@@ -168,4 +168,4 @@ def process_nearest_cars_data(start_time=10, end_time=None, input_file="sim_data
 
 if __name__ == "__main__":
     # 示例：从时间点10开始处理环形路径数据
-    process_nearest_cars_data(start_time=10, end_time=140)
+    process_nearest_cars_data(start_time=10, end_time=70)

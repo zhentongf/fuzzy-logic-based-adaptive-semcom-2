@@ -35,7 +35,10 @@ def main():
     
     if config["transmit_cifar10_graph"]:
         print("Starting CIFAR-10 transmission graph drawing...")
-        transmit_cifar10_graph.draw(config["main_path"])
+        transmit_cifar10_graph.draw(config["main_path"], csv_file="transmission_results_20261012_181523.csv")
+        transmit_cifar10_graph.draw(config["main_path"], csv_file="transmission_results_20261012_181725.csv")
+        transmit_cifar10_graph.draw(config["main_path"], csv_file="transmission_results_20261012_182032.csv")
+        transmit_cifar10_graph.draw(config["main_path"], csv_file="transmission_results_20261012_182139.csv")
 
     if config["train_encoder_decoder_mnist_graph"]:
         print("Starting MNIST encoder-decoder graph drawing...")
@@ -47,7 +50,10 @@ def main():
     
     if config["transmit_mnist_graph"]:
         print("Starting MNIST transmission graph drawing...")
-        transmit_mnist_graph.draw(config["main_path"])
+        transmit_mnist_graph.draw(config["main_path"], csv_file="transmission_results_20261012_182213.csv")
+        transmit_mnist_graph.draw(config["main_path"], csv_file="transmission_results_20261012_182236.csv")
+        transmit_mnist_graph.draw(config["main_path"], csv_file="transmission_results_20261012_182309.csv")
+        transmit_mnist_graph.draw(config["main_path"], csv_file="transmission_results_20261012_182321.csv")
         
 if __name__ == "__main__":
     main()
